@@ -27,7 +27,6 @@ import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
 
-import java.util.List;
 import java.util.Set;
 
 @Rule(
@@ -44,9 +43,10 @@ public class DuplicatePropertyNameCheck extends SquidCheck<EcmaScriptGrammar> {
   @Override
   public void visitNode(AstNode astNode) {
     Set<String> values = Sets.newHashSet();
-    List<AstNode> propertyAssignments = astNode.getChildren(getContext().getGrammar().propertyAssignment);
-    for (AstNode propertyAssignment : propertyAssignments) {
-      AstNode propertyName = propertyAssignment.getFirstChild(getContext().getGrammar().propertyName);
+
+    for (AstNode propertyName : astNode.select()
+        .children(getContext().getGrammar().propertyAssignment)
+        .children(getContext().getGrammar().propertyName)) {
       String value = propertyName.getTokenValue();
       if (value.startsWith("\"") || value.startsWith("'")) {
         value = value.substring(1, value.length() - 1);
