@@ -26,6 +26,7 @@ import org.sonar.check.BelongsToProfile;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 import java.util.Set;
 
@@ -43,8 +44,9 @@ public class DuplicateFunctionArgumentCheck extends SquidCheck<EcmaScriptGrammar
   @Override
   public void visitNode(AstNode astNode) {
     Set<String> values = Sets.newHashSet();
-    for (int i = 0; i < astNode.getNumberOfChildren(); i += 2) {
-      AstNode identifier = astNode.getChild(i);
+    AstSelect select = astNode.select().children();
+    for (int i = 0; i < select.size(); i += 2) {
+      AstNode identifier = select.get(i);
       String value = identifier.getTokenValue();
       String unescaped = EscapeUtils.unescape(value);
       if (values.contains(unescaped)) {
