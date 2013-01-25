@@ -25,6 +25,7 @@ import org.sonar.check.BelongsToProfile;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 @Rule(
   key = "AssignmentWithinCondition",
@@ -43,9 +44,13 @@ public class AssignmentWithinConditionCheck extends SquidCheck<EcmaScriptGrammar
 
   @Override
   public void visitNode(AstNode astNode) {
-    AstNode conditionNode = astNode.getFirstChild(getContext().getGrammar().condition);
-    if ((conditionNode != null) && (conditionNode.getChild(0).getFirstChild(getContext().getGrammar().assignmentExpression) != null)) {
-      getContext().createLineViolation(this, "Remove this assignment from the expression.", conditionNode);
+    // TODO what about firstChild?
+    AstSelect select = astNode.select().children(getContext().getGrammar().condition);
+    if (select
+        .children(getContext().getGrammar().expression)
+        .children(getContext().getGrammar().assignmentExpression)
+        .isNotEmpty()) {
+      getContext().createLineViolation(this, "Remove this assignment from the expression.", select.get(0) /* TODO looks ugly */);
     }
   }
 
