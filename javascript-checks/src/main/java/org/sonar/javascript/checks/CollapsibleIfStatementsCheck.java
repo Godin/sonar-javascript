@@ -25,6 +25,7 @@ import org.sonar.check.BelongsToProfile;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 @Rule(
   key = "CollapsibleIfStatements",
@@ -39,30 +40,34 @@ public class CollapsibleIfStatementsCheck extends SquidCheck<EcmaScriptGrammar> 
 
   @Override
   public void visitNode(AstNode node) {
-    if (isIfStatementWithoutElse(node)) {
-      AstNode innerStatement = node.getFirstChild(getContext().getGrammar().statement).getFirstChild();
-      if (isBlockAndContainsOnlyOneIfStatement(innerStatement) || isIfStatementWithoutElse(innerStatement)) {
-        getContext().createLineViolation(this, "Those two 'if' statements can be consolidated.", node);
-      }
+    AstSelect select = node.select();
+    if (hasNoElseClause(select) && (hasIfStatementWithoutElse(select) || hasIfStatementWithoutElseInCompoundStatement(select))) {
+      getContext().createLineViolation(this, "Those two 'if' statements can be consolidated.", node);
     }
   }
 
-  private boolean isBlockAndContainsOnlyOneIfStatement(AstNode statement) {
-    if (!statement.is(getContext().getGrammar().block)) {
-      return false;
-    }
-    AstNode statementList = statement.getFirstChild(getContext().getGrammar().statementList);
-    if (statementList == null || statementList.getNumberOfChildren() != 1 || statementList.getFirstChild().isNot(getContext().getGrammar().statement)) {
-      return false;
-    }
-    return isIfStatementWithoutElse(statementList.getFirstChild().getFirstChild());
+  private boolean hasNoElseClause(AstSelect select) {
+    // TODO what about firstChild?
+    return select.children(getContext().getGrammar().elseClause)
+        .isEmpty();
   }
 
-  private boolean isIfStatementWithoutElse(AstNode statement) {
-    if (statement.isNot(getContext().getGrammar().ifStatement) || statement.hasDirectChildren(getContext().getGrammar().elseClause)) {
-      return false;
-    }
-    return true;
+  private boolean hasIfStatementWithoutElseInCompoundStatement(AstSelect select) {
+    // TODO what about firstChild?
+    select = select.children(getContext().getGrammar().statement)
+        .children(getContext().getGrammar().block)
+        .children(getContext().getGrammar().statementList);
+    // TODO no need to fetch all children, but in fact it's cheap for single selection:
+    return select.children().size() == 1
+      && hasIfStatementWithoutElse(select);
+  }
+
+  private boolean hasIfStatementWithoutElse(AstSelect select) {
+    // TODO what about firstChild?
+    select = select
+        .children(getContext().getGrammar().statement)
+        .children(getContext().getGrammar().ifStatement);
+    return select.isNotEmpty() && hasNoElseClause(select);
   }
 
 }
