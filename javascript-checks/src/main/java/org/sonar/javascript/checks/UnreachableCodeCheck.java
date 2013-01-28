@@ -25,6 +25,7 @@ import org.sonar.check.BelongsToProfile;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 @Rule(
   key = "UnreachableCode",
@@ -43,16 +44,13 @@ public class UnreachableCodeCheck extends SquidCheck<EcmaScriptGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    while (node.getParent().is(getContext().getGrammar().statement)
-        || node.getParent().is(getContext().getGrammar().sourceElement)) {
-      node = node.getParent();
+    AstSelect select = node.select();
+    while (select.parent().filter(getContext().getGrammar().statement, getContext().getGrammar().sourceElement).isNotEmpty()) {
+      select = select.parent();
     }
-
-    if (node.getNextSibling() != null) {
-      AstNode v = node.getNextSibling();
-      if (!v.is(getContext().getGrammar().elseClause)) {
-        getContext().createLineViolation(this, "This statement can't be reached and so start a dead code block.", v);
-      }
+    select = select.nextSibling();
+    if (select.isNotEmpty() && select.filter(getContext().getGrammar().elseClause).isEmpty()) {
+      getContext().createLineViolation(this, "This statement can't be reached and so start a dead code block.", select.iterator().next());
     }
   }
 
