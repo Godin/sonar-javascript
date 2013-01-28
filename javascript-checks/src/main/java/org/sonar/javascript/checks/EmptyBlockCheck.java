@@ -39,7 +39,7 @@ public class EmptyBlockCheck extends SquidCheck<EcmaScriptGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if (!node.hasDirectChildren(getContext().getGrammar().statementList)) {
+    if (node.select().children(getContext().getGrammar().statementList).isEmpty()) {
       getContext().createLineViolation(this, "Provide the missing piece of code.", node);
     }
   }
