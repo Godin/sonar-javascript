@@ -24,6 +24,7 @@ import com.sonar.sslr.squid.checks.SquidCheck;
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 @Rule(
   key = "ElseIfWithoutElse",
@@ -37,20 +38,16 @@ public class ElseIfWithoutElseCheck extends SquidCheck<EcmaScriptGrammar> {
 
   @Override
   public void visitNode(AstNode node) {
-    if (isElseIf(node)) {
-      AstNode elseClause = node.getFirstChild(getContext().getGrammar().elseClause);
-      if (elseClause == null) {
+    AstSelect select = node.select();
+    if (isElseIf(select)) {
+      if (node.select().children(getContext().getGrammar().elseClause).isEmpty()) {
         getContext().createLineViolation(this, "End this if...else if construct by an else clause.", node);
       }
     }
   }
 
-  private boolean isElseIf(AstNode node) {
-    return isElse(node.getParent().getParent());
-  }
-
-  private boolean isElse(AstNode node) {
-    return node != null && node.is(getContext().getGrammar().elseClause);
+  private boolean isElseIf(AstSelect select) {
+    return select.parent().parent().filter(getContext().getGrammar().elseClause).isNotEmpty();
   }
 
 }
