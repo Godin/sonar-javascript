@@ -26,6 +26,7 @@ import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.javascript.api.EcmaScriptGrammar;
 import org.sonar.javascript.api.EcmaScriptPunctuator;
+import org.sonar.sslr.internal.ast.select.AstSelect;
 
 @Rule(
   key = "SwitchWithoutDefault",
@@ -40,10 +41,10 @@ public class SwitchWithoutDefaultCheck extends SquidCheck<EcmaScriptGrammar> {
 
   @Override
   public void visitNode(AstNode astNode) {
-    AstNode defaultClauseNode = astNode.getFirstChild(getContext().getGrammar().defaultClause);
-    if (defaultClauseNode == null) {
+    AstSelect defaultClauseNode = astNode.select().children(getContext().getGrammar().defaultClause);
+    if (defaultClauseNode.isEmpty()) {
       getContext().createLineViolation(this, "Avoid switch statement without a \"default\" clause.", astNode);
-    } else if (defaultClauseNode.getNextSibling().isNot(EcmaScriptPunctuator.RCURLYBRACE)) {
+    } else if (!defaultClauseNode.nextSibling().filter(EcmaScriptPunctuator.RCURLYBRACE).isNotEmpty()) {
       getContext().createLineViolation(this, "\"default\" clause should be the last one.", astNode);
     }
   }
