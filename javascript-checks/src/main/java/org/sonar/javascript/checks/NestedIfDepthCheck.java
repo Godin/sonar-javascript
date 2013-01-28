@@ -80,8 +80,7 @@ public class NestedIfDepthCheck extends SquidCheck<EcmaScriptGrammar> {
   }
 
   private boolean isElseIf(AstNode astNode) {
-    return astNode.getParent().getPreviousSibling() != null
-        && astNode.getParent().getPreviousSibling().is(EcmaScriptKeyword.ELSE);
+    return astNode.select().parent().previousSibling().filter(EcmaScriptKeyword.ELSE).isNotEmpty();
   }
 
 }
