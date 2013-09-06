@@ -28,7 +28,7 @@ package org.sonar.javascript.model;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface ConditionalOperatorTree extends ExpressionTree {
+public interface ConditionalOperatorTree extends ExpressionTree, Matchers.HasCondition {
 
   ExpressionTree condition();
 

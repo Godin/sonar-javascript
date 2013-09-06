@@ -19,33 +19,11 @@
  */
 package org.sonar.javascript.model;
 
-import javax.annotation.Nullable;
-import java.util.List;
+public interface Matcher<T extends Tree> {
 
-/**
- * <a href="http://www.ecma-international.org/ecma-262/5.1/#sec-12.6.3">for Statement</a>.
- *
- * <pre>
- *   for ( {@link #initExpression()} ; {@link #condition()} ; {@link #incrementExpression()}) {@link #statement()}
- *   for ( var {@link #initVariables()} ; {@link #condition()} ; {@link #incrementExpression()} ) {@link #statement()}
- * </pre>
- *
- * <p>This interface is not intended to be implemented by clients.</p>
- */
-public interface ForStatementTree extends StatementTree, Matchers.HasCondition, Matchers.HasBody {
-
-  @Nullable
-  List<VariableDeclarationTree> initVariables();
-
-  @Nullable
-  ExpressionTree initExpression();
-
-  @Nullable
-  ExpressionTree condition();
-
-  @Nullable
-  ExpressionTree incrementExpression();
-
-  StatementTree statement();
+  /**
+   * Captures matched node to be later retrieved.
+   */
+  Matcher<T> capture();
 
 }

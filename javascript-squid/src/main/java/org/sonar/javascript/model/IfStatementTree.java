@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface IfStatementTree extends StatementTree {
+public interface IfStatementTree extends StatementTree, Matchers.HasCondition {
 
   ExpressionTree condition();
 

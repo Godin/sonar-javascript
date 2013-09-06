@@ -28,7 +28,7 @@ package org.sonar.javascript.model;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface DoWhileStatementTree extends StatementTree {
+public interface DoWhileStatementTree extends StatementTree, Matchers.HasCondition, Matchers.HasBody {
 
   StatementTree statement();
 

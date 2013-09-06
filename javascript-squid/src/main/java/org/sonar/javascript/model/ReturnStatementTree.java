@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface ReturnStatementTree extends StatementTree {
+public interface ReturnStatementTree extends StatementTree, Matchers.HasExpression {
 
   @Nullable
   ExpressionTree expression();

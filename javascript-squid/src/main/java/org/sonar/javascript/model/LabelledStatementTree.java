@@ -28,7 +28,7 @@ package org.sonar.javascript.model;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface LabelledStatementTree extends StatementTree {
+public interface LabelledStatementTree extends StatementTree, Matchers.HasBody {
 
   IdentifierTree label();
 

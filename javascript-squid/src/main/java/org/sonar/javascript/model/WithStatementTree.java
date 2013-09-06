@@ -28,7 +28,7 @@ package org.sonar.javascript.model;
  *
  * <p>This interface is not intended to be implemented by clients.</p>
  */
-public interface WithStatementTree extends StatementTree {
+public interface WithStatementTree extends StatementTree, Matchers.HasExpression, Matchers.HasBody {
 
   ExpressionTree expression();
 
